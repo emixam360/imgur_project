@@ -10,4 +10,5 @@
     <string name="button_write">Ecrire</string>
     <string name="button_save">Sauver dans le tel</string>
     <string name="button_upload">Poster sur imgur</string>
+    <string name="foldername">ImgurProject</string>
 </resources>
