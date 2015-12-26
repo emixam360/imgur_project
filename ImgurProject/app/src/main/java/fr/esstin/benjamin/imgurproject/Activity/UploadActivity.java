@@ -1,8 +1,10 @@
 package fr.esstin.benjamin.imgurproject.Activity;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -32,7 +35,7 @@ public class UploadActivity extends AppCompatActivity {
 
     Boolean picture_selected = Boolean.FALSE;
 
-    private static int RESULT_TAKE_PICTURE = 1;
+    private static int REQUEST_IMAGE_CAPTURE = 1;
     private static int RESULT_LOAD_IMAGE = 2;
 
 
@@ -73,8 +76,11 @@ public class UploadActivity extends AppCompatActivity {
         button_take.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                Intent i = new Intent("android.media.action.IMAGE_CAPTURE");
-                startActivityForResult(i, RESULT_TAKE_PICTURE);
+                Intent i = new Intent(
+                        MediaStore.ACTION_IMAGE_CAPTURE);
+                if (i.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(i, REQUEST_IMAGE_CAPTURE);
+                }
             }
         });
 
@@ -111,26 +117,17 @@ public class UploadActivity extends AppCompatActivity {
             imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
         }
 
-        if (requestCode ==RESULT_TAKE_PICTURE){
-            //date dans le nom du fichier
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd_MM_yyyy_h_m_s");
-            String dateStr = simpleDateFormat.format(new Date());
-
-            //création du dossier si il n'existe pas //etExternalStorageDirectory()
-            File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/" + getApplicationContext().getString(R.string.foldername));
-            boolean success = true;
-            if (!folder.exists()) {
-                success = folder.mkdir();
-            }
-            //Enregistrement du fichier
-            File photo = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/" + getApplicationContext().getString(R.string.foldername), "imgur" + dateStr + ".jpg");
-            data.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
 
             setPicture_selected();
+            imageView.setImageBitmap(imageBitmap);
 
+/*
             Toast.makeText(this, "Image enregistrée dans " + getApplicationContext().getString(R.string.foldername),
                     Toast.LENGTH_LONG).show();
-
+*/
         }
     }
 }
