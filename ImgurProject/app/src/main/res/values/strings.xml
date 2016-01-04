@@ -2,13 +2,4 @@
     <string name="app_name">ImgurProject</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
-
-    <string name="title_activity_upload">Upload d\'une photo</string>
-    <string name="upload_description">Prenez ou choisissez une photo, ecrivez là et uploadez là sur imgur</string>
-    <string name="button_take">Prendre une photo</string>
-    <string name="button_select">Choisir une photo</string>
-    <string name="button_write">Ecrire</string>
-    <string name="button_save">Sauver dans le tel</string>
-    <string name="button_upload">Poster sur imgur</string>
-    <string name="foldername">ImgurProject</string>
 </resources>

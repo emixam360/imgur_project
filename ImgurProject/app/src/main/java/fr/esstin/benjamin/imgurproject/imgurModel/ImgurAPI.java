@@ -16,7 +16,7 @@ import retrofit.http.Query;
 public interface ImgurAPI {
     String server = "https://api.imgur.com";
 
-    @POST("/image")
+    @POST("/3/image")
     void postImage(
             @Header("Authorization") String auth,
             //@Query("image") TypedFile file,
@@ -33,7 +33,7 @@ public interface ImgurAPI {
             @Header("Authorization") String auth
     );
 
-    @GET("/gallery/{section}/{sort}/{page}/")
+    @GET("/3/gallery/{section}/{sort}/{page}/")
     Call<GalleryAlbumResponse> getGallery(
             @Header("Authorization") String auth,
             @Path("section") Section section,

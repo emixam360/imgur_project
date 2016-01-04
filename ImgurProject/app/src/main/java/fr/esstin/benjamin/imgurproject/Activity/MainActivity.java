@@ -1,7 +1,5 @@
 package fr.esstin.benjamin.imgurproject.Activity;
 
-import android.content.Context;
-import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -10,25 +8,20 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-
-import java.util.ArrayList;
-
 import fr.esstin.benjamin.imgurproject.R;
-import fr.esstin.benjamin.imgurproject.imgurModel.GalleryParents;
-import fr.esstin.benjamin.imgurproject.services.GalleryService;
+import fr.esstin.benjamin.imgurproject.services.DownloadGallery;
+import fr.esstin.benjamin.imgurproject.utils.NetworkUtils;
 
 public class MainActivity extends AppCompatActivity {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    public GalleryService service;
+    private TextView text;
 
     private ViewPager mViewPager;
 
@@ -37,10 +30,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        service = new GalleryService(this.getBaseContext());
-        service.execute(0);
 
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), service);
+
+        if(NetworkUtils.isConnected(this.getBaseContext())) {
+            text = (TextView) findViewById(R.id.progressText);
+            new DownloadGallery(text).execute();
+        }
+        else{
+            Log.d("", "notConnected");
+        }
+
+
+
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -52,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, UploadActivity.class);
-                startActivity(intent);
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
         });
 
@@ -70,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
         private static final String ARG_SECTION_NUMBER = "section_number";
 
         public PlaceholderFragment() {
-
         }
 
         public static PlaceholderFragment newInstance(int sectionNumber) {
@@ -86,17 +87,45 @@ public class MainActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.content_scrolling, container, false);
 
+            /*LinearLayout rT = (LinearLayout) v.findViewById(R.id.ScrollLayout);
+            if (result.get(i).getClass() == GalleryAlbum.class){
+                GalleryAlbum gA = (GalleryAlbum) result.get(i);
+                TextView Tv = new TextView(rT.getContext());
+                Tv.setText(gA.title);
+                rT.addView(Tv);
+                for (GalleryImage I: gA.images) {
+                    TextView TvN = new TextView(rT.getContext());
+                    TvN.setText(I.title);
+                    rT.addView(TvN);
+                    ImageView Iv = new ImageView(rT.getContext());
+                    Ion.with(Iv).load(I.link);
+                    rT.addView(Iv);
+                    TextView TvND = new TextView(rT.getContext());
+                    TvND.setText(I.description);
+                    rT.addView(TvND);
+                }
+            }
+            else if (result.get(i).getClass() == GalleryImage.class){
+                GalleryImage gI = (GalleryImage) result.get(i);
+                TextView TvN = new TextView(rT.getContext());
+                TvN.setText(gI.title);
+                rT.addView(TvN);
+                ImageView Iv = new ImageView(rT.getContext());
+                Ion.with(Iv).load(gI.link);
+                rT.addView(Iv);
+                TextView TvND = new TextView(rT.getContext());
+                TvND.setText(gI.description);
+                rT.addView(TvND);
+            }*/
+
             return rootView;
         }
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        GalleryService service;
-
-        public SectionsPagerAdapter(FragmentManager fm, GalleryService service) {
+        public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
-            this.service = service;
         }
 
         @Override

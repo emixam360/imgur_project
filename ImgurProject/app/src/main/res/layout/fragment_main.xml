@@ -8,6 +8,9 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".Activity.MainActivity$PlaceholderFragment">
 
+
+
     <include layout="@layout/content_scrolling" />
+
 
 </RelativeLayout>
