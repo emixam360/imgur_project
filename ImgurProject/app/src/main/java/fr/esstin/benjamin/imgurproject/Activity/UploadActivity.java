@@ -32,6 +32,8 @@ import java.util.Date;
 
 import fr.esstin.benjamin.imgurproject.R;
 
+import static fr.esstin.benjamin.imgurproject.utils.LargeBitmapsUtil.decodeSampledBitmapFromResource;
+
 public class UploadActivity extends AppCompatActivity {
 
     Button button_take, button_select,button_save,button_upload, button_write;
@@ -39,13 +41,17 @@ public class UploadActivity extends AppCompatActivity {
     ImageView imageView;
     Canvas canvas;
 
-    Bitmap bitmap;
+    String pathorg;
 
+    Bitmap bitmap;
 
     Boolean picture_selected = Boolean.FALSE;
 
     private static int RESULT_LOAD_IMAGE = 2;
     private static int REQUEST_TAKE_PHOTO = 3;
+
+    int widthbitmap = 200;
+    int heightbitmap = 200;
 
 
     @Override
@@ -126,6 +132,7 @@ public class UploadActivity extends AppCompatActivity {
     };
 
     public void write(){
+        Bitmap bitmap = decodeSampledBitmapFromResource(pathorg, widthbitmap, heightbitmap);
         android.graphics.Bitmap.Config bitmapConfig =
                 bitmap.getConfig();
         // set default bitmap config if none
@@ -156,10 +163,11 @@ public class UploadActivity extends AppCompatActivity {
 
         canvas.drawText(editText.getText().toString(), x, y, paint);
 
-        imageView.setImageBitmap(bitmap);
+        //imageView.setImageBitmap(bitmap);
+        imageView.setImageBitmap(
+                bitmap);
     };
 
-    String mCurrentPhotoPath;
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -174,7 +182,7 @@ public class UploadActivity extends AppCompatActivity {
         );
 
         // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
+        pathorg = image.getAbsolutePath();
         return image;
     }
 
@@ -191,19 +199,23 @@ public class UploadActivity extends AppCompatActivity {
             cursor.moveToFirst();
 
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
+            pathorg = cursor.getString(columnIndex);
             cursor.close();
 
             setPicture_selected();
-            bitmap = BitmapFactory.decodeFile(picturePath);
-            imageView.setImageBitmap(bitmap);
+            //bitmap = BitmapFactory.decodeFile(picturePath);
+            //imageView.setImageBitmap(bitmap);
+            imageView.setImageBitmap(
+                    decodeSampledBitmapFromResource(pathorg, widthbitmap, heightbitmap));
         }
 
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath);
+            //bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath);
 
             setPicture_selected();
-            imageView.setImageBitmap(bitmap);
+            //imageView.setImageBitmap(bitmap);
+            imageView.setImageBitmap(
+                    decodeSampledBitmapFromResource(pathorg, widthbitmap, heightbitmap));
 
 /*
             Toast.makeText(this, "Image enregistrée dans " + getApplicationContext().getString(R.string.foldername),
