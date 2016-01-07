@@ -1,6 +1,5 @@
 package fr.esstin.benjamin.imgurproject.Activity;
 
-import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -13,30 +12,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-import com.koushikdutta.ion.Ion;
-import com.koushikdutta.ion.gson.GsonSerializer;
-
-import java.io.IOException;
-import java.util.ArrayList;
-
-import fr.esstin.benjamin.imgurproject.Constants;
 import fr.esstin.benjamin.imgurproject.R;
-import fr.esstin.benjamin.imgurproject.imgurModel.GalleryAlbum;
-import fr.esstin.benjamin.imgurproject.imgurModel.GalleryAlbumResponse;
-import fr.esstin.benjamin.imgurproject.imgurModel.GalleryConverter;
-import fr.esstin.benjamin.imgurproject.imgurModel.GalleryImage;
-import fr.esstin.benjamin.imgurproject.imgurModel.GalleryParents;
-import fr.esstin.benjamin.imgurproject.imgurModel.GalleryResponse;
-import fr.esstin.benjamin.imgurproject.imgurModel.ImgurAPI;
 import fr.esstin.benjamin.imgurproject.services.DownloadGallery;
-import fr.esstin.benjamin.imgurproject.services.ServiceGenerator;
 import fr.esstin.benjamin.imgurproject.utils.NetworkUtils;
-import retrofit.Call;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,20 +25,30 @@ public class MainActivity extends AppCompatActivity {
 
     private ViewPager mViewPager;
 
-    private ArrayList<GalleryParents> FrontPage;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        text = (TextView) findViewById(R.id.progressText);
+
+
 
         if(NetworkUtils.isConnected(this.getBaseContext())) {
-            new DownloadGallery().execute();
+            text = (TextView) findViewById(R.id.progressText);
+            new DownloadGallery(text).execute();
         }
         else{
             Log.d("", "notConnected");
         }
+
+
+
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -80,16 +70,14 @@ public class MainActivity extends AppCompatActivity {
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
-        private static final String ARG_GALLERY = "gallery";
 
         public PlaceholderFragment() {
         }
 
-        public static PlaceholderFragment newInstance(int sectionNumber, GalleryParents gallery) {
+        public static PlaceholderFragment newInstance(int sectionNumber) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            args.putSerializable(ARG_GALLERY, gallery);
             fragment.setArguments(args);
             return fragment;
         }
@@ -98,12 +86,10 @@ public class MainActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.content_scrolling, container, false);
-            int i = getArguments().getInt(ARG_SECTION_NUMBER);
-            GalleryParents gP = (GalleryParents) getArguments().getSerializable(ARG_GALLERY);
 
-            LinearLayout rT = (LinearLayout) rootView.findViewById(R.id.ScrollLayout);
-            if (gP.getClass() == GalleryAlbum.class){
-                GalleryAlbum gA = (GalleryAlbum) gP;
+            /*LinearLayout rT = (LinearLayout) v.findViewById(R.id.ScrollLayout);
+            if (result.get(i).getClass() == GalleryAlbum.class){
+                GalleryAlbum gA = (GalleryAlbum) result.get(i);
                 TextView Tv = new TextView(rT.getContext());
                 Tv.setText(gA.title);
                 rT.addView(Tv);
@@ -119,8 +105,8 @@ public class MainActivity extends AppCompatActivity {
                     rT.addView(TvND);
                 }
             }
-            else if (gP.getClass() == GalleryImage.class){
-                GalleryImage gI = (GalleryImage) gP;
+            else if (result.get(i).getClass() == GalleryImage.class){
+                GalleryImage gI = (GalleryImage) result.get(i);
                 TextView TvN = new TextView(rT.getContext());
                 TvN.setText(gI.title);
                 rT.addView(TvN);
@@ -130,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView TvND = new TextView(rT.getContext());
                 TvND.setText(gI.description);
                 rT.addView(TvND);
-            }
+            }*/
 
             return rootView;
         }
@@ -138,78 +124,19 @@ public class MainActivity extends AppCompatActivity {
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public int size;
-
-        public SectionsPagerAdapter(int size, FragmentManager fm) {
+        public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
-            this.size = size;
         }
 
         @Override
         public Fragment getItem(int position) {
-            return PlaceholderFragment.newInstance(position, FrontPage.get(position));
+            return PlaceholderFragment.newInstance(position);
         }
 
         @Override
         public int getCount() {
-            return size;
+            return 60;
         }
-    }
-
-    public class DownloadGallery extends AsyncTask<Void, String, ArrayList<GalleryParents>> {
-
-        public DownloadGallery(){
-        }
-
-        @Override
-        protected ArrayList<GalleryParents> doInBackground(Void... params) {
-            publishProgress("Téléchargement en cours");
-
-            FrontPage = new ArrayList<>();
-
-            ImgurAPI ImgurSrv = ServiceGenerator.createService(ImgurAPI.class);
-            Call<GalleryResponse> call = ImgurSrv.getGallery(
-                    Constants.getClientAuth()
-            );
-
-            try {
-                FrontPage = new GalleryConverter().convertGallery(call.execute().body().data);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            for (int j = 0; j < FrontPage.size(); j++) {
-                if (FrontPage.get(j).getClass() == GalleryAlbum.class) {
-                    GalleryAlbum gA = (GalleryAlbum) FrontPage.get(j);
-                    Call<GalleryAlbumResponse> call2 = ImgurSrv.getGalleryAlbum(
-                            Constants.getClientAuth(),
-                            gA.id
-                    );
-                    try {
-                        FrontPage.set(j, new GalleryConverter().convertAlbum(call2.execute().body().data));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            return FrontPage;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<GalleryParents> gallery) {
-            text.setVisibility(View.INVISIBLE);
-            Log.d("",gallery.toString());
-
-            mSectionsPagerAdapter = new SectionsPagerAdapter(gallery.size(), getSupportFragmentManager());
-
-            mViewPager = (ViewPager) findViewById(R.id.container);
-            mViewPager.setAdapter(mSectionsPagerAdapter);
-        }
-
-        @Override
-        protected void onProgressUpdate(String... progressTest){
-            text.setText(progressTest[0]);
-        }
-
     }
 }
 
