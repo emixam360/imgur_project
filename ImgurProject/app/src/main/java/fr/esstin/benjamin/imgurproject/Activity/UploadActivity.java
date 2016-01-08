@@ -26,6 +26,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -50,8 +52,8 @@ public class UploadActivity extends AppCompatActivity {
     private static int RESULT_LOAD_IMAGE = 2;
     private static int REQUEST_TAKE_PHOTO = 3;
 
-    int widthbitmap = 200;
-    int heightbitmap = 200;
+    int widthbitmap = 500;
+    int heightbitmap = 500;
 
 
     @Override
@@ -118,6 +120,17 @@ public class UploadActivity extends AppCompatActivity {
                 write();
             }
         });
+
+        button_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                try {
+                    save();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     };
 
     public void setPicture_selected(){
@@ -131,7 +144,7 @@ public class UploadActivity extends AppCompatActivity {
         };
     };
 
-    public void write(){
+    public Bitmap write(){
         Bitmap bitmap = decodeSampledBitmapFromResource(pathorg, widthbitmap, heightbitmap);
         android.graphics.Bitmap.Config bitmapConfig =
                 bitmap.getConfig();
@@ -149,7 +162,7 @@ public class UploadActivity extends AppCompatActivity {
         // text color - #3D3D3D
         paint.setColor(Color.rgb(255, 255, 255));
         // text size in pixels
-        paint.setTextSize((int) (240));
+        paint.setTextSize((int) (140));
 
         Typeface tf =Typeface.createFromAsset(getAssets(),"impact.ttf");
         paint.setTypeface(tf);
@@ -166,13 +179,33 @@ public class UploadActivity extends AppCompatActivity {
         //imageView.setImageBitmap(bitmap);
         imageView.setImageBitmap(
                 bitmap);
+        return bitmap;
+    };
+
+    public void save() throws IOException {
+        File photoFile = null;
+        try {
+            photoFile = createImageFile();
+        } catch (IOException ex) {
+        }
+        // Continue only if the File was successfully created
+        if (photoFile != null) {
+            bitmap = write();
+            FileOutputStream fOut = new FileOutputStream(photoFile);
+
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+            fOut.flush();
+            fOut.close();
+
+        }
+
     };
 
 
     private File createImageFile() throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String timeStamp = new SimpleDateFormat("ddMMyyyy_HH:mm:ss").format(new Date());
+        String imageFileName = "imgurproject_" + timeStamp;
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
