@@ -31,4 +31,37 @@ public class GalleryImage extends GalleryParents {
     public int points;
     public int score;
     public boolean is_album;
+
+    @Override
+    public String toString() {
+        return "GalleryImage{" +
+                "id='" + id + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", datetime=" + datetime +
+                ", type='" + type + '\'' +
+                ", animated=" + animated +
+                ", width=" + width +
+                ", height=" + height +
+                ", size=" + size +
+                ", views=" + views +
+                ", bandwidth=" + bandwidth +
+                ", link='" + link + '\'' +
+                ", gifv='" + gifv + '\'' +
+                ", mp4='" + mp4 + '\'' +
+                ", webm='" + webm + '\'' +
+                ", looping=" + looping +
+                ", vote=" + vote +
+                ", favorite=" + favorite +
+                ", nsfw=" + nsfw +
+                ", topic='" + topic + '\'' +
+                ", topic_id=" + topic_id +
+                ", section='" + section + '\'' +
+                ", ups=" + ups +
+                ", downs=" + downs +
+                ", points=" + points +
+                ", score=" + score +
+                ", is_album=" + is_album +
+                '}';
+    }
 }
