@@ -45,8 +45,6 @@ public class UploadActivity extends AppCompatActivity {
 
     String pathorg;
 
-    Bitmap bitmap;
-
     Boolean picture_selected = Boolean.FALSE;
 
     private static int RESULT_LOAD_IMAGE = 2;
@@ -99,7 +97,7 @@ public class UploadActivity extends AppCompatActivity {
                     // Create the File where the photo should go
                     File photoFile = null;
                     try {
-                        photoFile = createImageFile();
+                        photoFile = createImageFile(Boolean.TRUE);
                     } catch (IOException ex) {
                     }
                     // Continue only if the File was successfully created
@@ -146,8 +144,8 @@ public class UploadActivity extends AppCompatActivity {
 
     public Bitmap write(){
         Bitmap bitmap = decodeSampledBitmapFromResource(pathorg, widthbitmap, heightbitmap);
-        android.graphics.Bitmap.Config bitmapConfig =
-                bitmap.getConfig();
+        //Bitmap bitmap = BitmapFactory.decodeFile(pathorg);
+        android.graphics.Bitmap.Config bitmapConfig = bitmap.getConfig();
         // set default bitmap config if none
         if(bitmapConfig == null) {
             bitmapConfig = android.graphics.Bitmap.Config.ARGB_8888;
@@ -176,24 +174,22 @@ public class UploadActivity extends AppCompatActivity {
 
         canvas.drawText(editText.getText().toString(), x, y, paint);
 
-        //imageView.setImageBitmap(bitmap);
-        imageView.setImageBitmap(
-                bitmap);
+        imageView.setImageBitmap(bitmap);
         return bitmap;
     };
 
     public void save() throws IOException {
         File photoFile = null;
         try {
-            photoFile = createImageFile();
+            photoFile = createImageFile(Boolean.FALSE);
         } catch (IOException ex) {
         }
         // Continue only if the File was successfully created
         if (photoFile != null) {
-            bitmap = write();
+            Bitmap b = write();
             FileOutputStream fOut = new FileOutputStream(photoFile);
 
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+            b.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
             fOut.flush();
             fOut.close();
 
@@ -202,7 +198,7 @@ public class UploadActivity extends AppCompatActivity {
     };
 
 
-    private File createImageFile() throws IOException {
+    private File createImageFile(Boolean selected) throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("ddMMyyyy_HH:mm:ss").format(new Date());
         String imageFileName = "imgurproject_" + timeStamp;
@@ -214,8 +210,10 @@ public class UploadActivity extends AppCompatActivity {
                 storageDir      /* directory */
         );
 
-        // Save a file: path for use with ACTION_VIEW intents
-        pathorg = image.getAbsolutePath();
+        if(selected == Boolean.TRUE) {
+            pathorg = image.getAbsolutePath();
+        };
+
         return image;
     }
 
