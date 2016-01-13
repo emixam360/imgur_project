@@ -20,25 +20,24 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-<<<<<<< HEAD
+
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-=======
+
 import android.util.Log;
->>>>>>> origin/master
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-<<<<<<< HEAD
+
 import android.widget.TextView;
 import android.widget.Toast;
-=======
 
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.RequestBody;
->>>>>>> origin/master
+
 
 import java.io.File;
 import java.io.FileOutputStream;
