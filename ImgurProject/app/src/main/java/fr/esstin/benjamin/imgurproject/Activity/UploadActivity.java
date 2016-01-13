@@ -1,6 +1,7 @@
 package fr.esstin.benjamin.imgurproject.Activity;
 
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
@@ -19,24 +20,42 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+<<<<<<< HEAD
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+=======
+import android.util.Log;
+>>>>>>> origin/master
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+<<<<<<< HEAD
 import android.widget.TextView;
 import android.widget.Toast;
+=======
+
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.RequestBody;
+>>>>>>> origin/master
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import fr.esstin.benjamin.imgurproject.Constants;
 import fr.esstin.benjamin.imgurproject.R;
+import fr.esstin.benjamin.imgurproject.imgurModel.GalleryImage;
+import fr.esstin.benjamin.imgurproject.imgurModel.ImageResponse;
+import fr.esstin.benjamin.imgurproject.imgurModel.ImgurAPI;
+import fr.esstin.benjamin.imgurproject.services.ServiceGenerator;
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 import static fr.esstin.benjamin.imgurproject.utils.LargeBitmapsUtil.decodeSampledBitmapFromResource;
 
@@ -84,6 +103,37 @@ public class UploadActivity extends AppCompatActivity {
         button_write.setVisibility(View.GONE);
         editText.setVisibility(View.GONE);
         imageView.setVisibility(View.GONE);
+
+        button_upload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImgurAPI ImgurSrv = ServiceGenerator.createService(ImgurAPI.class);
+                RequestBody request = RequestBody.create(MediaType.parse("multipart/form-data"), new File(pathorg));
+                Call<ImageResponse> call = ImgurSrv.postImage(
+                        Constants.getClientAuth(),
+                        request/*
+                        "name",
+                        "Image",
+                        "Description"*/
+                );
+                call.enqueue(new Callback<ImageResponse>() {
+                    @Override
+                    public void onResponse(Response<ImageResponse> response, Retrofit retrofit) {
+                        Log.d("",response.body().data.toString());
+                        GalleryImage gI = response.body().data;
+                        // id de l'image -> gI.id
+                        //le lien du coup c'est http://imgur.com/{id}
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        Log.d("","Fail");
+                    }
+                });
+
+            }
+        });
+
 
         button_select.setOnClickListener(new View.OnClickListener() {
             @Override

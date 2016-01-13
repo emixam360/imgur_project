@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
@@ -35,6 +34,7 @@ import fr.esstin.benjamin.imgurproject.imgurModel.GalleryResponse;
 import fr.esstin.benjamin.imgurproject.imgurModel.ImgurAPI;
 import fr.esstin.benjamin.imgurproject.services.ServiceGenerator;
 import fr.esstin.benjamin.imgurproject.utils.NetworkUtils;
+import pl.droidsonroids.gif.GifImageView;
 import retrofit.Call;
 
 public class MainActivity extends AppCompatActivity {
@@ -176,46 +176,81 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout rT = (LinearLayout) rootView.findViewById(R.id.ScrollLayout);
             if (gP.getClass() == GalleryAlbum.class){
                 GalleryAlbum gA = (GalleryAlbum) gP;
-                TextView Tv = new TextView(rT.getContext());
-                Tv.setText(gA.title);
-                rT.addView(Tv);
+
+                if(gA.title != null){
+                    TextView Tv = new TextView(rT.getContext());
+                    Tv.setText(gA.title);
+                    rT.addView(Tv);
+                }
+
                 for (GalleryImage I: gA.images) {
-                    TextView TvN = new TextView(rT.getContext());
-                    TvN.setText(I.title);
-                    rT.addView(TvN);
-                    ImageView Iv = new ImageView(rT.getContext());
-                    Ion.with(Iv).load(I.link);
-                    rT.addView(Iv);
-                    TextView TvND = new TextView(rT.getContext());
-                    TvND.setText(I.description);
-                    rT.addView(TvND);
+                    if(I.title != null){
+                        TextView TvN = new TextView(rT.getContext());
+                        TvN.setText(I.title);
+                        rT.addView(TvN);
+                    }
+
+
+                    if(I.type.equals(Constants.GIF)){
+                        GifImageView Iv = new GifImageView(rT.getContext());
+                        rT.addView(Iv);
+                        Ion
+                                .with(Iv)
+                                .fitCenter()
+                                .load(I.link);
+                    }else{
+                        ImageView Iv = new ImageView(rT.getContext());
+                        rT.addView(Iv);
+                        Ion
+                                .with(Iv)
+                                .fitCenter()
+                                .load(I.link);
+                    }
+
+
+                    if (I.description != null) {
+                        TextView TvND = new TextView(rT.getContext());
+                        TvND.setText(I.description);
+                        rT.addView(TvND);
+                    }
+
                 }
             }
-            else if (gP.getClass() == GalleryImage.class){
-                GalleryImage gI = (GalleryImage) gP;
+            else {
+                if (gP.getClass() == GalleryImage.class) {
+                    GalleryImage gI = (GalleryImage) gP;
 
-                TextView t = new TextView(rT.getContext());
-                t.setText(gI.toString());
-                rT.addView(t);
+                    /*TextView t = new TextView(rT.getContext());
+                    t.setText(gI.toString());
+                    rT.addView(t);*/
 
-                if(gI.title != null){
-                    TextView TvN = new TextView(rT.getContext());
-                    TvN.setText(gI.title);
-                    rT.addView(TvN);
-                }
-                if(gI.animated == true){
+                    if (gI.title != null) {
+                        TextView TvN = new TextView(rT.getContext());
+                        TvN.setText(gI.title);
+                        rT.addView(TvN);
+                    }
 
-                }else{
+                    if (gI.type.equals(Constants.GIF)) {
+                        GifImageView Iv = new GifImageView(rT.getContext());
+                        rT.addView(Iv);
+                        Ion
+                                .with(Iv)
+                                .fitCenter()
+                                .load(gI.link);
+                    } else {
+                        ImageView Iv = new ImageView(rT.getContext());
+                        rT.addView(Iv);
+                        Ion
+                                .with(Iv)
+                                .fitCenter()
+                                .load(gI.link);
+                    }
 
-                }
-                ImageView Iv = new ImageView(rT.getContext());
-                Ion.with(Iv).load(gI.link);
-                rT.addView(Iv);
-
-                if(gI.description != null) {
-                    TextView TvND = new TextView(rT.getContext());
-                    TvND.setText(gI.description);
-                    rT.addView(TvND);
+                    if (gI.description != null) {
+                        TextView TvND = new TextView(rT.getContext());
+                        TvND.setText(gI.description);
+                        rT.addView(TvND);
+                    }
                 }
             }
 
