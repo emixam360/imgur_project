@@ -19,10 +19,14 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -42,6 +46,8 @@ public class UploadActivity extends AppCompatActivity {
     EditText editText;
     ImageView imageView;
     Canvas canvas;
+
+    TextView instruction;
 
     String pathorg;
 
@@ -70,6 +76,7 @@ public class UploadActivity extends AppCompatActivity {
         button_write = (Button) findViewById(R.id.button_write);
         editText = (EditText) findViewById(R.id.editText);
         imageView = (ImageView) findViewById(R.id.imageView);
+        instruction = (TextView) findViewById(R.id.textView);
 
 
         button_save.setVisibility(View.GONE);
@@ -138,6 +145,7 @@ public class UploadActivity extends AppCompatActivity {
             button_write.setVisibility(View.VISIBLE);
             editText.setVisibility(View.VISIBLE);
             imageView.setVisibility(View.VISIBLE);
+            instruction.setVisibility(View.GONE);
             picture_selected = Boolean.TRUE;
         };
     };
@@ -155,12 +163,14 @@ public class UploadActivity extends AppCompatActivity {
         bitmap = bitmap.copy(bitmapConfig, true);
         canvas = new Canvas(bitmap);
 
+
         // new antialised Paint
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         // text color - #3D3D3D
         paint.setColor(Color.rgb(255, 255, 255));
         // text size in pixels
         paint.setTextSize((int) (140));
+
 
         Typeface tf =Typeface.createFromAsset(getAssets(),"impact.ttf");
         paint.setTypeface(tf);
@@ -170,9 +180,12 @@ public class UploadActivity extends AppCompatActivity {
         Rect bounds = new Rect();
         paint.getTextBounds(editText.getText().toString(), 0, editText.getText().toString().length(), bounds);
         int x = (bitmap.getWidth() - bounds.width())/2;
-        int y = (bitmap.getHeight() + bounds.height())/2;
+        int y = bounds.height() * (5/4);
+
+
 
         canvas.drawText(editText.getText().toString(), x, y, paint);
+
 
         imageView.setImageBitmap(bitmap);
         return bitmap;
