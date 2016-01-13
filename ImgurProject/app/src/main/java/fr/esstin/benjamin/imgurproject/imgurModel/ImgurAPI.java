@@ -1,12 +1,22 @@
 package fr.esstin.benjamin.imgurproject.imgurModel;
 
+import android.media.Image;
+
+import com.google.gson.JsonObject;
+import com.squareup.okhttp.RequestBody;
+
+import java.io.File;
+
 import fr.esstin.benjamin.imgurproject.imgurEnum.Section;
 import fr.esstin.benjamin.imgurproject.imgurEnum.Sort;
 import retrofit.Call;
 import retrofit.Callback;
+import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.Header;
+import retrofit.http.Multipart;
 import retrofit.http.POST;
+import retrofit.http.Part;
 import retrofit.http.Path;
 import retrofit.http.Query;
 
@@ -16,16 +26,15 @@ import retrofit.http.Query;
 public interface ImgurAPI {
     String server = "https://api.imgur.com";
 
+    @Multipart
     @POST("/3/image")
-    void postImage(
+    Call<ImageResponse> postImage(
             @Header("Authorization") String auth,
-            //@Query("image") TypedFile file,
-            @Query("album") String albumId,
-            @Query("type") String type,
-            @Query("name") String name,
-            @Query("title") String title,
-            @Query("description") String description,
-            Callback<ImageResponse> cb
+            @Part("image") RequestBody file
+            /*@Part("type") String type,
+            @Part("name") String name,
+            @Part("title") String title,
+            @Part("description") String description*/
     );
 
     @GET("/3/gallery")
