@@ -31,10 +31,6 @@ public interface ImgurAPI {
     Call<ImageResponse> postImage(
             @Header("Authorization") String auth,
             @Part("image") RequestBody file
-            /*@Part("type") String type,
-            @Part("name") String name,
-            @Part("title") String title,
-            @Part("description") String description*/
     );
 
     @GET("/3/gallery")
