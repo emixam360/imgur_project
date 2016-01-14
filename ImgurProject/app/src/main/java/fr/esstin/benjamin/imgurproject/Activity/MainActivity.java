@@ -18,7 +18,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.koushikdutta.ion.Ion;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.model.GlideUrl;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,13 +35,12 @@ import fr.esstin.benjamin.imgurproject.imgurModel.GalleryResponse;
 import fr.esstin.benjamin.imgurproject.imgurModel.ImgurAPI;
 import fr.esstin.benjamin.imgurproject.services.ServiceGenerator;
 import fr.esstin.benjamin.imgurproject.utils.NetworkUtils;
-import pl.droidsonroids.gif.GifImageView;
 import retrofit.Call;
 
 public class MainActivity extends AppCompatActivity {
 
     private FragmentStatePagerAdapter MyAdapter;
-    private TextView text;
+    private ImageView loading;
 
     private ViewPager mViewPager;
 
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        text = (TextView) findViewById(R.id.progressText);
+        loading = (ImageView) findViewById(R.id.GifLoader);
 
         if(NetworkUtils.isConnected(this.getBaseContext())) {
             new DownloadGallery().execute();
@@ -70,14 +70,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public class DownloadGallery extends AsyncTask<Void, String, ArrayList<GalleryParents>> {
+    public class DownloadGallery extends AsyncTask<Void, ImageView, ArrayList<GalleryParents>> {
 
         public DownloadGallery(){
         }
 
         @Override
         protected ArrayList<GalleryParents> doInBackground(Void... params) {
-            publishProgress("Téléchargement en cours");
+
+            publishProgress(loading);
 
             FrontPage = new ArrayList<>();
 
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(ArrayList<GalleryParents> gallery) {
-            text.setVisibility(View.INVISIBLE);
+            loading.setVisibility(View.INVISIBLE);
             Log.d("",gallery.toString());
 
             MyAdapter = new SectionsPagerAdapter(gallery.size(), getSupportFragmentManager());
@@ -121,8 +122,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onProgressUpdate(String... progressTest){
-            text.setText(progressTest[0]);
+        protected void onProgressUpdate(ImageView... gif){
+            Glide.with(getBaseContext()).load("").asGif().placeholder(R.mipmap.giphy).into(gif[0]);
         }
 
     }
@@ -178,38 +179,35 @@ public class MainActivity extends AppCompatActivity {
                 GalleryAlbum gA = (GalleryAlbum) gP;
 
                 if(gA.title != null){
-                    TextView Tv = new TextView(rT.getContext());
+                    TextView Tv = new TextView(getContext());
                     Tv.setText(gA.title);
                     rT.addView(Tv);
                 }
 
                 for (GalleryImage I: gA.images) {
                     if(I.title != null){
-                        TextView TvN = new TextView(rT.getContext());
-                        TvN.setText(I.title);
+                        TextView TvN = new TextView(getContext());
+                        TvN.setText(I.link);
                         rT.addView(TvN);
                     }
 
-
+                    ImageView Iv = new ImageView(getContext());
+                    rT.addView(Iv);
                     if(I.type.equals(Constants.GIF)){
-                        GifImageView Iv = new GifImageView(rT.getContext());
-                        rT.addView(Iv);
-                        Ion
-                                .with(Iv)
-                                .fitCenter()
-                                .load(I.link);
+                        Glide.with(this)
+                                .load(I.link)
+                                .asGif()
+                                .into(Iv);
+
                     }else{
-                        ImageView Iv = new ImageView(rT.getContext());
-                        rT.addView(Iv);
-                        Ion
-                                .with(Iv)
-                                .fitCenter()
-                                .load(I.link);
+                        Glide.with(this)
+                                .load(I.link)
+                                .asBitmap()
+                                .into(Iv);
                     }
 
-
                     if (I.description != null) {
-                        TextView TvND = new TextView(rT.getContext());
+                        TextView TvND = new TextView(getContext());
                         TvND.setText(I.description);
                         rT.addView(TvND);
                     }
@@ -220,34 +218,28 @@ public class MainActivity extends AppCompatActivity {
                 if (gP.getClass() == GalleryImage.class) {
                     GalleryImage gI = (GalleryImage) gP;
 
-                    /*TextView t = new TextView(rT.getContext());
-                    t.setText(gI.toString());
-                    rT.addView(t);*/
-
                     if (gI.title != null) {
-                        TextView TvN = new TextView(rT.getContext());
-                        TvN.setText(gI.title);
+                        TextView TvN = new TextView(getContext());
+                        TvN.setText(gI.link);
                         rT.addView(TvN);
                     }
 
+                    ImageView Iv = new ImageView(getContext());
+                    rT.addView(Iv);
                     if (gI.type.equals(Constants.GIF)) {
-                        GifImageView Iv = new GifImageView(rT.getContext());
-                        rT.addView(Iv);
-                        Ion
-                                .with(Iv)
-                                .fitCenter()
-                                .load(gI.link);
+                        Glide.with(this)
+                                .load(gI.link)
+                                .asGif()
+                                .into(Iv);
                     } else {
-                        ImageView Iv = new ImageView(rT.getContext());
-                        rT.addView(Iv);
-                        Ion
-                                .with(Iv)
-                                .fitCenter()
-                                .load(gI.link);
+                        Glide.with(this)
+                                .load(gI.link)
+                                .asBitmap()
+                                .into(Iv);
                     }
 
                     if (gI.description != null) {
-                        TextView TvND = new TextView(rT.getContext());
+                        TextView TvND = new TextView(getContext());
                         TvND.setText(gI.description);
                         rT.addView(TvND);
                     }

@@ -8,6 +8,12 @@
     android:fitsSystemWindows="true"
     tools:context=".Activity.MainActivity">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/GifLoader"
+        android:padding="5dp" />
+
     <android.support.v4.view.ViewPager
         android:id="@+id/container"
         android:layout_width="match_parent"
@@ -24,12 +30,5 @@
         app:backgroundTint="@color/colorPrimary"
         android:background="@color/white"
         android:tint="@color/white"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/progressText"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
 
 </android.support.design.widget.CoordinatorLayout>

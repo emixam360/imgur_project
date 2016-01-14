@@ -97,10 +97,9 @@ public class UploadActivity extends AppCompatActivity {
                 RequestBody request = RequestBody.create(MediaType.parse("multipart/form-data"), new File(pathorg));
                 Call<ImageResponse> call = ImgurSrv.postImage(
                         Constants.getClientAuth(),
-                        request/*
+                        request,
                         "name",
-                        "Image",
-                        "Description"*/
+                        "Description"
                 );
                 call.enqueue(new Callback<ImageResponse>() {
                     @Override
