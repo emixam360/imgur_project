@@ -1,5 +1,7 @@
 package fr.esstin.benjamin.imgurproject.imgurModel;
 
+import java.util.Arrays;
+
 /**
  * Created by Benjamin on 02/12/2015.
  */
@@ -27,4 +29,33 @@ public class GalleryAlbum extends GalleryParents {
     public int topic_id;
     public int images_count;
     public GalleryImage[] images;
+
+    @Override
+    public String toString() {
+        return "GalleryAlbum{" +
+                "id='" + id + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", datetime=" + datetime +
+                ", cover='" + cover + '\'' +
+                ", cover_width=" + cover_width +
+                ", cover_height=" + cover_height +
+                ", privacy='" + privacy + '\'' +
+                ", layout='" + layout + '\'' +
+                ", views=" + views +
+                ", link='" + link + '\'' +
+                ", ups=" + ups +
+                ", downs=" + downs +
+                ", points=" + points +
+                ", score=" + score +
+                ", is_album=" + is_album +
+                ", vote='" + vote + '\'' +
+                ", favorite=" + favorite +
+                ", nsfw=" + nsfw +
+                ", topic='" + topic + '\'' +
+                ", topic_id=" + topic_id +
+                ", images_count=" + images_count +
+                ", images=" + Arrays.toString(images) +
+                '}';
+    }
 }

@@ -8,11 +8,22 @@
     android:fitsSystemWindows="true"
     tools:context=".Activity.MainActivity">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/textLoader"
+        android:padding="5dp"
+        android:id="@+id/TextLoader"/>
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/GifLoader"
-        android:padding="5dp" />
+        android:foregroundGravity="center"
+        android:padding="25dp"
+        android:contentDescription="@string/loadingGif" />
+
 
     <android.support.v4.view.ViewPager
         android:id="@+id/container"

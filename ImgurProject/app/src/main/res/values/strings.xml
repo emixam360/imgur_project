@@ -12,4 +12,7 @@
     <string name="copy">Copier l\'url</string>
     <string name="share">Partager l\'url</string>
     <string name="saved">Image enregistrée dans le dossier Image</string>
+    <string name="textLoader">Chargement...</string>
+    <string name="loadingGif">LoadingGif</string>
+    <string name="loadingFail">Oups, une erreur ...</string>
 </resources>

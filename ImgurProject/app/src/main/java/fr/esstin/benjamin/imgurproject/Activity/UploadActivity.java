@@ -203,6 +203,7 @@ public class UploadActivity extends AppCompatActivity {
         try {
             photoFile = createImageFile(Boolean.FALSE); //creation d'un fichier
         } catch (IOException ex) {
+            Log.d("","Fail");
         }
         if (photoFile != null) {
             Bitmap b = write(); //ecriture du texte sur l'image
@@ -221,7 +222,7 @@ public class UploadActivity extends AppCompatActivity {
     //création d'un fichier où placer une image
     private File createImageFile(Boolean selected) throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("ddMMyyyy_HH:mm:ss").format(new Date());
+        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
         String imageFileName = R.string.app_name +"_"+ timeStamp;
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES); //emplacement dans le dossier des images

@@ -1,6 +1,7 @@
 package fr.esstin.benjamin.imgurproject.Activity;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -19,7 +20,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.model.GlideUrl;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private FragmentStatePagerAdapter MyAdapter;
     private ImageView loading;
+    private TextView ltext;
 
     private ViewPager mViewPager;
 
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         loading = (ImageView) findViewById(R.id.GifLoader);
+        ltext = (TextView) findViewById(R.id.TextLoader);
 
         if(NetworkUtils.isConnected(this.getBaseContext())) {
             new DownloadGallery().execute();
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public class DownloadGallery extends AsyncTask<Void, ImageView, ArrayList<GalleryParents>> {
+    public class DownloadGallery extends AsyncTask<Void, View, ArrayList<GalleryParents>> {
 
         public DownloadGallery(){
         }
@@ -78,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected ArrayList<GalleryParents> doInBackground(Void... params) {
 
-            publishProgress(loading);
+            publishProgress(loading, ltext);
 
             FrontPage = new ArrayList<>();
 
@@ -113,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<GalleryParents> gallery) {
             loading.setVisibility(View.INVISIBLE);
+            ltext.setVisibility(View.INVISIBLE);
             Log.d("",gallery.toString());
 
             MyAdapter = new SectionsPagerAdapter(gallery.size(), getSupportFragmentManager());
@@ -122,8 +125,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onProgressUpdate(ImageView... gif){
-            Glide.with(getBaseContext()).load("").asGif().placeholder(R.mipmap.giphy).into(gif[0]);
+        protected void onProgressUpdate(View... gif){
+            Glide.with(getBaseContext())
+                    .load(R.mipmap.giphy)
+                    .dontTransform()
+                    .into((ImageView) gif[0]);
+            ((TextView) gif[1]).setText("Chargement ...");
         }
 
     }
@@ -178,40 +185,54 @@ public class MainActivity extends AppCompatActivity {
             if (gP.getClass() == GalleryAlbum.class){
                 GalleryAlbum gA = (GalleryAlbum) gP;
 
-                if(gA.title != null){
+                if (gA.title != null) {
                     TextView Tv = new TextView(getContext());
                     Tv.setText(gA.title);
+                    Tv.setTypeface(Typeface.DEFAULT_BOLD, Typeface.BOLD);
+                    Tv.setTextSize(18);
+                    LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    params1.setMargins(0, 0, 0, 16);
+                    Tv.setLayoutParams(params1);
                     rT.addView(Tv);
                 }
 
                 for (GalleryImage I: gA.images) {
                     if(I.title != null){
                         TextView TvN = new TextView(getContext());
-                        TvN.setText(I.link);
+                        TvN.setText(I.title);
+                        LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        params2.setMargins(0, 0, 0, 16);
+                        TvN.setLayoutParams(params2);
                         rT.addView(TvN);
                     }
 
                     ImageView Iv = new ImageView(getContext());
+                    LinearLayout.LayoutParams params3  = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    params3.setMargins(0, 0, 0, 16);
+                    Iv.setLayoutParams(params3);
                     rT.addView(Iv);
+
                     if(I.type.equals(Constants.GIF)){
-                        Glide.with(this)
+                        Glide.with(getContext())
                                 .load(I.link)
-                                .asGif()
                                 .into(Iv);
 
                     }else{
-                        Glide.with(this)
+                        Glide.with(getContext())
                                 .load(I.link)
                                 .asBitmap()
+                                .fitCenter()
                                 .into(Iv);
                     }
 
                     if (I.description != null) {
                         TextView TvND = new TextView(getContext());
                         TvND.setText(I.description);
+                        LinearLayout.LayoutParams params4  = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        params4.setMargins(0, 0, 0, 16);
+                        TvND.setLayoutParams(params4);
                         rT.addView(TvND);
                     }
-
                 }
             }
             else {
@@ -220,27 +241,37 @@ public class MainActivity extends AppCompatActivity {
 
                     if (gI.title != null) {
                         TextView TvN = new TextView(getContext());
-                        TvN.setText(gI.link);
+                        TvN.setText(gI.title);
+                        TvN.setTypeface(Typeface.DEFAULT_BOLD, Typeface.BOLD);
+                        TvN.setTextSize(18);
+                        LinearLayout.LayoutParams params1  = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        params1.setMargins(0, 0, 0, 16);
+                        TvN.setLayoutParams(params1);
                         rT.addView(TvN);
                     }
 
                     ImageView Iv = new ImageView(getContext());
+                    LinearLayout.LayoutParams params2  = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    params2.setMargins(0, 0, 0, 16);
+                    Iv.setLayoutParams(params2);
                     rT.addView(Iv);
                     if (gI.type.equals(Constants.GIF)) {
-                        Glide.with(this)
+                        Glide.with(getContext())
                                 .load(gI.link)
-                                .asGif()
                                 .into(Iv);
                     } else {
-                        Glide.with(this)
+                        Glide.with(getContext())
                                 .load(gI.link)
-                                .asBitmap()
+                                .fitCenter()
                                 .into(Iv);
                     }
 
                     if (gI.description != null) {
                         TextView TvND = new TextView(getContext());
                         TvND.setText(gI.description);
+                        LinearLayout.LayoutParams params3  = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        params3.setMargins(0, 0, 0, 16);
+                        TvND.setLayoutParams(params3);
                         rT.addView(TvND);
                     }
                 }
