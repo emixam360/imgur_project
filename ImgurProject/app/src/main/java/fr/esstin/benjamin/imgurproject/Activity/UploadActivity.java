@@ -23,6 +23,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -56,7 +57,7 @@ public class UploadActivity extends AppCompatActivity {
     ImageView imageView;
     Canvas canvas; //canvas pour l'écriture de l'image
     TextView instruction;
-    String pathorg, pathmod, link; //pathorg, lien vers l'image selectionné, link lien vers l'image uploadé, pathmod lien vers l'image écrite
+    public String pathorg, pathmod, link; //pathorg, lien vers l'image selectionné, link lien vers l'image uploadé, pathmod lien vers l'image écrite
     Boolean picture_selected = Boolean.FALSE; //passe à true une fois qu'une image a été selectionnée
 
     private static int RESULT_LOAD_IMAGE = 2;
@@ -120,6 +121,7 @@ public class UploadActivity extends AppCompatActivity {
                     try {
                         photoFile = createImageFile(Boolean.TRUE);
                     } catch (IOException ex) {
+                        Log.d("",ex.getMessage().toString());
                     }
                     // Continue only if the File was successfully created
                     if (photoFile != null) {
@@ -136,6 +138,7 @@ public class UploadActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
                 write();
+                hideSoftKeyboard();
             }
         });
 
@@ -226,17 +229,30 @@ public class UploadActivity extends AppCompatActivity {
         String imageFileName = R.string.app_name +"_"+ timeStamp;
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES); //emplacement dans le dossier des images
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
+
+
+        //File image = File.createTempFile(
+        //        imageFileName,  /* prefix */
+        //        ".jpg",         /* suffix */
+        //        storageDir      /* directory */
+        //);
+
+        File image = new File(storageDir+imageFileName+".jpg");
+        image.createNewFile();
 
         //si image sélectionnée via la galerie
         if(selected == Boolean.TRUE) {
             pathorg = image.getAbsolutePath();
         }
         return image;
+    }
+
+    //reduction du clavier
+    public void hideSoftKeyboard() {
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
     }
 
     //upload de l'image sur imgur

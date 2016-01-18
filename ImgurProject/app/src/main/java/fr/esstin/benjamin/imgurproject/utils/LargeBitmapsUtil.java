@@ -3,6 +3,8 @@ package fr.esstin.benjamin.imgurproject.utils;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import java.io.File;
 
@@ -50,3 +52,4 @@ public class LargeBitmapsUtil {
         return BitmapFactory.decodeFile(path, options);
     }
 }
+
