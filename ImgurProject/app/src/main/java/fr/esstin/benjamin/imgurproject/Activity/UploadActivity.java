@@ -294,7 +294,7 @@ public class UploadActivity extends AppCompatActivity {
     }
 
 
-    //Actiions après la selection d'image dans la galerie ou la prise de photo
+    //Actions après la selection d'image dans la galerie ou la prise de photo
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

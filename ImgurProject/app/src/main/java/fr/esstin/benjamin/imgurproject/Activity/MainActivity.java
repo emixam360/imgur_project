@@ -1,5 +1,9 @@
 package fr.esstin.benjamin.imgurproject.Activity;
 
+import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -54,12 +58,7 @@ public class MainActivity extends AppCompatActivity {
         loading = (ImageView) findViewById(R.id.GifLoader);
         ltext = (TextView) findViewById(R.id.TextLoader);
 
-        if(NetworkUtils.isConnected(this.getBaseContext())) {
-            new DownloadGallery().execute();
-        }
-        else{
-            Log.d("", "notConnected");
-        }
+        downloadGal();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -69,7 +68,24 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
 
+    public void downloadGal(){
+        if(NetworkUtils.isConnected(this.getBaseContext())) {
+            new DownloadGallery().execute();
+        }
+        else{
+            new AlertDialog.Builder(this)
+                    .setTitle("Network fail")
+                    .setMessage("Please turn on internet on your device")
+                            //premier bouton copier coller
+                    .setPositiveButton("Retry", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            downloadGal();
+                        }
+                    })
+                    .show();
+        }
     }
 
     public class DownloadGallery extends AsyncTask<Void, View, ArrayList<GalleryParents>> {
@@ -215,6 +231,8 @@ public class MainActivity extends AppCompatActivity {
                     if(I.type.equals(Constants.GIF)){
                         Glide.with(getContext())
                                 .load(I.link)
+                                .asGif()
+                                .dontTransform()
                                 .into(Iv);
 
                     }else{
@@ -258,6 +276,8 @@ public class MainActivity extends AppCompatActivity {
                     if (gI.type.equals(Constants.GIF)) {
                         Glide.with(getContext())
                                 .load(gI.link)
+                                .asGif()
+                                .dontTransform()
                                 .into(Iv);
                     } else {
                         Glide.with(getContext())
