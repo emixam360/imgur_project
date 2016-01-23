@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fragment="fr.esstin.benjamin.imgurproject.Activity.SettingsActivity$PrefsFragment"
+    >
+
+    <PreferenceCategory
+        android:title="Download Settings">
+
+        <ListPreference
+            android:title="section"
+            android:entries="@array/section_list"
+            android:key="section"
+            android:entryValues="@array/section_list"
+            android:defaultValue="hot"/>
+        <ListPreference
+            android:title="sort"
+            android:entries="@array/sort_list"
+            android:key="sort"
+            android:entryValues="@array/sort_list"
+            android:defaultValue="viral"/>
+        <ListPreference
+            android:title="page"
+            android:entries="@array/page_list"
+            android:key="page"
+            android:entryValues="@array/page_list"
+            android:defaultValue="0"/>
+        <Preference
+            android:key="Validation"
+            android:title="Validation button"></Preference>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

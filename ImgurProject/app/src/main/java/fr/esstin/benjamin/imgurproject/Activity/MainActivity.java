@@ -1,12 +1,12 @@
 package fr.esstin.benjamin.imgurproject.Activity;
 
 import android.app.AlertDialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,10 +15,10 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -45,11 +45,13 @@ import retrofit.Call;
 
 public class MainActivity extends AppCompatActivity {
 
-    private FragmentStatePagerAdapter MyAdapter;
-    private ImageView loading;
-    private TextView ltext;
+    private static final int RESULT_SETTINGS = 1;
 
     private ViewPager mViewPager;
+    private FragmentStatePagerAdapter MyAdapter;
+
+    private ImageView loading;
+    private TextView lText;
 
     private ArrayList<GalleryParents> FrontPage;
 
@@ -57,8 +59,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         loading = (ImageView) findViewById(R.id.GifLoader);
-        ltext = (TextView) findViewById(R.id.TextLoader);
+        lText = (TextView) findViewById(R.id.TextLoader);
+        mViewPager = (ViewPager) findViewById(R.id.container);
+
+        clearSharedPrefs();
 
         downloadGal();
 
@@ -74,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void downloadGal(){
         if(NetworkUtils.isConnected(this.getBaseContext())) {
-            new DownloadGallery().execute();
+            getUserSettings();
         }
         else{
             new AlertDialog.Builder(this)
@@ -83,28 +89,39 @@ public class MainActivity extends AppCompatActivity {
                             //premier bouton copier coller
                     .setPositiveButton("Retry", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            downloadGal();
+                            getUserSettings();
                         }
                     })
                     .show();
         }
     }
 
-    public class DownloadGallery extends AsyncTask<Void, View, ArrayList<GalleryParents>> {
+    public class DownloadGallery extends AsyncTask<String, View, ArrayList<GalleryParents>> {
 
         public DownloadGallery(){
         }
 
         @Override
-        protected ArrayList<GalleryParents> doInBackground(Void... params) {
+        protected void onPreExecute(){
+            loading.setVisibility(View.VISIBLE);
+            lText.setVisibility(View.VISIBLE);
+            mViewPager.setVisibility(View.INVISIBLE);
+        }
 
-            publishProgress(loading, ltext);
+
+        @Override
+        protected ArrayList<GalleryParents> doInBackground(String... params) {
+
+            publishProgress(loading, lText);
 
             FrontPage = new ArrayList<>();
 
             ImgurAPI ImgurSrv = ServiceGenerator.createService(ImgurAPI.class);
             Call<GalleryResponse> call = ImgurSrv.getGallery(
-                    Constants.getClientAuth()
+                    Constants.getClientAuth(),
+                    params[0],
+                    params[1],
+                    params[2]
             );
 
             try {
@@ -133,12 +150,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<GalleryParents> gallery) {
             loading.setVisibility(View.INVISIBLE);
-            ltext.setVisibility(View.INVISIBLE);
-            Log.d("",gallery.toString());
+            lText.setVisibility(View.INVISIBLE);
+            mViewPager.setVisibility(View.VISIBLE);
+            Log.d("", gallery.toString());
 
             MyAdapter = new SectionsPagerAdapter(gallery.size(), getSupportFragmentManager());
-
-            mViewPager = (ViewPager) findViewById(R.id.container);
             mViewPager.setAdapter(MyAdapter);
         }
 
@@ -229,7 +245,6 @@ public class MainActivity extends AppCompatActivity {
                     params3.setMargins(0, 0, 0, 16);
                     Iv.setLayoutParams(params3);
                     rT.addView(Iv);
-
                     if(I.type.equals(Constants.GIF)){
                         Glide.with(getContext())
                                 .load(I.link)
@@ -284,6 +299,7 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         Glide.with(getContext())
                                 .load(gI.link)
+                                .asBitmap()
                                 .fitCenter()
                                 .into(Iv);
                     }
@@ -307,6 +323,51 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.action_settings:
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivityForResult(i, RESULT_SETTINGS);
+                break;
+
+        }
+
+        return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case RESULT_SETTINGS:
+                getUserSettings();
+                break;
+
+        }
+
+    }
+
+    private void getUserSettings() {
+        SharedPreferences sharedPrefs = PreferenceManager
+                .getDefaultSharedPreferences(this);
+
+        new DownloadGallery().execute(
+                sharedPrefs.getString("section", "hot"),
+                sharedPrefs.getString("sort", "viral"),
+                sharedPrefs.getString("page", "0"));
+    }
+
+    public void clearSharedPrefs()
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.clear();
+        editor.commit();
     }
 }
 
